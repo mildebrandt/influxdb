@@ -191,11 +191,8 @@ func NewHandler(c Config, reg services.Registry) *Handler {
 			"write", // Data-ingest route.
 			"POST", "/write", true, writeLogEnabled,
 			func(w http.ResponseWriter, r *http.Request, user meta.User) {
-				if reg.IsRunning("tsdb") {
-					h.serveWrite(w, r, user)
-					return
-				}
-				h.httpError(w, "tsdb store is not ready", http.StatusServiceUnavailable)
+				<-reg.WaitFor("tsdb")
+				h.serveWrite(w, r, user)
 			},
 		},
 		Route{

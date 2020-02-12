@@ -10,20 +10,42 @@ const (
 )
 
 type Registry interface {
-	IsRunning(string) bool   // indicates if a service is running by name
-	Register(string) error   // register a service as running
-	Unregister(string) error // remove a running service
+	WaitFor(string) <-chan struct{} //
+	IsRunning(string) bool          // indicates if a service is running by name
+	Register(string) error          // register a service as running
+	Unregister(string) error        // remove a running service
 }
 
 func NewRegistry() Registry {
 	return &localRegistry{
-		s: make(map[string]struct{}),
+		s:  make(map[string]struct{}),
+		ch: make(map[string]chan struct{}),
 	}
 }
 
 type localRegistry struct {
-	sync.RWMutex                     // rw mutex used to protect our s map
-	s            map[string]struct{} // map storing service names
+	sync.RWMutex                          // rw mutex used to protect our s map
+	s            map[string]struct{}      // map storing service names
+	ch           map[string]chan struct{} // map storing service names
+}
+
+func (l *localRegistry) WaitFor(s string) <-chan struct{} {
+	l.Lock()
+	defer l.Unlock()
+
+	if _, ok := l.s[s]; ok {
+		// our service is registerd.  return a closed channel to prevent caller from blocking
+		rc := make(chan struct{})
+		close(rc)
+		return rc
+	}
+
+	ch, ok := l.ch[s]
+	if !ok {
+		ch = make(chan struct{})
+		l.ch[s] = ch
+	}
+	return ch
 }
 
 func (l *localRegistry) IsRunning(s string) bool {
@@ -40,6 +62,11 @@ func (l *localRegistry) Register(s string) error {
 		return fmt.Errorf("%s already registered", s)
 	}
 	l.s[s] = struct{}{}
+
+	if ch, ok := l.ch[s]; ok {
+		close(ch)
+		delete(l.ch, s)
+	}
 	return nil
 }
 
