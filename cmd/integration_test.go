@@ -1,6 +1,7 @@
 package cmd_test
 
 import (
+	"context"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -59,7 +60,7 @@ func NewTestRunCommand(env map[string]string) *TestRunCommand {
 
 // MustRun calls Command.Run and panics if there is an error.
 func (c *TestRunCommand) MustRun() {
-	if err := c.Command.Run("-config", os.DevNull); err != nil {
+	if err := c.Command.Run(context.Background(), "-config", os.DevNull); err != nil {
 		panic(err)
 	}
 }
