@@ -384,8 +384,6 @@ func (s *Service) serve(ctx context.Context) error {
 			return err
 		}
 	}
-
-	return nil
 }
 
 // handleConn processes conn. This is run in a separate goroutine.
