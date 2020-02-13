@@ -1,4 +1,4 @@
-module github.com/influxdata/influxdb/v2
+module github.com/mildebrandt/influxdb/v2
 
 go 1.13
 
