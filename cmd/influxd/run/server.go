@@ -377,14 +377,14 @@ func (s *Server) Err() <-chan error { return s.err }
 // Open opens the meta and data store and all services.
 func (s *Server) Open() error {
 	ctx, cancel := context.WithCancel(context.Background())
-		s.cancel = cancel
+	s.cancel = cancel
 	return s.OpenWithContext(ctx)
 }
 
 // Open opens the meta and data store and all services.
 func (s *Server) Close() error {
-		s.cancel()
-			return nil
+	s.cancel()
+	return nil
 }
 
 func (s *Server) OpenWithContext(ctx context.Context) error {
