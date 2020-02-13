@@ -81,6 +81,7 @@ func (m *Main) run(args ...string) error {
 	cmd.Logger.Info("Starting services")
 	errCh := make(chan error, 1)
 	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
 	go func() { errCh <- cmd.Run(ctx, args...) }()
 
 	// wait for message on errCh or signalCh
