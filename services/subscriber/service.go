@@ -172,7 +172,6 @@ func (s *Service) waitForMetaUpdates(ctx context.Context) error {
 			}
 		}
 	}
-	return nil
 }
 
 // Update will start new and stop deleted subscriptions.

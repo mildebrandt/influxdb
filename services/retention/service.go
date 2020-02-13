@@ -160,6 +160,4 @@ func (s *Service) run(ctx context.Context) error {
 			logEnd()
 		}
 	}
-
-	return nil
 }

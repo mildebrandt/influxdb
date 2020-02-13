@@ -113,8 +113,6 @@ func (m *Main) run(args ...string) error {
 			return fmt.Errorf("server failed to shutdown after %v", deadline)
 		}
 	}
-
-	return nil
 }
 
 // Run determines and runs the command specified by the CLI args.

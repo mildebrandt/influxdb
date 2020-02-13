@@ -232,7 +232,6 @@ func (s *Service) backgroundLoop(ctx context.Context) error {
 			t.Reset(s.RunInterval)
 		}
 	}
-	return nil
 }
 
 // hasContinuousQueries returns true if any CQs exist.
