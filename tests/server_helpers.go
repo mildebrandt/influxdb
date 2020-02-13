@@ -269,6 +269,9 @@ func (s *LocalServer) Close() {
 		panic(err.Error())
 	}
 
+	// give s.Server.Close() time to remove files
+	time.Sleep(time.Second)
+
 	if cleanupData {
 		if err := os.RemoveAll(s.Config.rootPath); err != nil {
 			panic(err.Error())

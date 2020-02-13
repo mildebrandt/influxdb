@@ -107,6 +107,7 @@ type Server struct {
 	config *Config
 
 	cancel context.CancelFunc // used to implement backwards compatible Open()/Close() api
+	closed chan struct{}
 }
 
 // updateTLSConfig stores with into the tls config pointed at by into but only if with is not nil
@@ -184,6 +185,7 @@ func NewServer(c *Config, buildInfo *BuildInfo) (*Server, error) {
 		tcpAddr:     bind,
 
 		config: c,
+		closed: make(chan struct{}),
 	}
 	s.Monitor = monitor.New(s, c.Monitor)
 	s.config.registerDiagnostics(s.Monitor)
@@ -378,16 +380,26 @@ func (s *Server) Err() <-chan error { return s.err }
 func (s *Server) Open() error {
 	ctx, cancel := context.WithCancel(context.Background())
 	s.cancel = cancel
-	return s.OpenWithContext(ctx)
+
+	ready := make(chan struct{})
+	go s.OpenWithContextReady(ctx, ready)
+
+	<-ready
+	return nil
+}
+
+func (s *Server) OpenWithContext(ctx context.Context) error {
+	return s.OpenWithContextReady(ctx, nil)
 }
 
 // Open opens the meta and data store and all services.
 func (s *Server) Close() error {
 	s.cancel()
+	<-s.closed
 	return nil
 }
 
-func (s *Server) OpenWithContext(ctx context.Context) error {
+func (s *Server) OpenWithContextReady(ctx context.Context, ready chan struct{}) error {
 	// Start profiling, if set.
 	s.startProfile()
 
@@ -496,6 +508,11 @@ func (s *Server) OpenWithContext(ctx context.Context) error {
 		go s.startServerReporting(ctx)
 	}
 
+	// signal that we're ready
+	if ready != nil {
+		close(ready)
+	}
+
 	// wait for a cancellation signal
 	<-ctx.Done()
 	s.stopProfile()
@@ -512,6 +529,7 @@ func (s *Server) OpenWithContext(ctx context.Context) error {
 	}
 
 	s.config.deregisterDiagnostics(s.Monitor)
+	close(s.closed)
 
 	return nil
 }

@@ -10,10 +10,11 @@ import (
 
 	"fmt"
 
+	"strings"
+
 	"github.com/influxdata/influxdb/cmd/influxd/backup"
 	"github.com/influxdata/influxdb/cmd/influxd/restore"
 	"github.com/influxdata/influxdb/toml"
-	"strings"
 )
 
 func TestServer_BackupAndRestore(t *testing.T) {
@@ -178,6 +179,9 @@ func TestServer_BackupAndRestore(t *testing.T) {
 	// now open it up and verify we're good
 	s := OpenServer(config)
 	defer s.Close()
+
+	// give server time to start up
+	time.Sleep(time.Second)
 
 	// 1.  offline restore is correct
 	res, err := s.Query(`select * from "mydb"."forever"."myseries"`)

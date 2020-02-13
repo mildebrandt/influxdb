@@ -79,6 +79,7 @@ func TestServer_HTTPResponseVersion(t *testing.T) {
 	version := "v1234"
 	s := OpenServerWithVersion(NewConfig(), version)
 	defer s.Close()
+	time.Sleep(3 * time.Second)
 
 	resp, _ := http.Get(s.URL() + "/query")
 	got := resp.Header.Get("X-Influxdb-Version")
@@ -349,6 +350,7 @@ func TestServer_RetentionPolicyCommands(t *testing.T) {
 func TestServer_DatabaseRetentionPolicyAutoCreate(t *testing.T) {
 	t.Parallel()
 	s := OpenServer(NewConfig())
+	time.Sleep(time.Second)
 	defer s.Close()
 
 	test := tests.load(t, "retention_policy_auto_create")

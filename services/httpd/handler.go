@@ -177,11 +177,18 @@ func NewHandler(c Config, reg services.Registry) *Handler {
 		},
 		Route{
 			"query", // Query serving route.
-			"GET", "/query", true, true, h.serveQuery,
+			"GET", "/query", true, true, func(w http.ResponseWriter, r *http.Request, user meta.User) {
+				<-reg.WaitFor("tsdb")
+				h.serveQuery(w, r, user)
+			},
 		},
+
 		Route{
 			"query", // Query serving route.
-			"POST", "/query", true, true, h.serveQuery,
+			"POST", "/query", true, true, func(w http.ResponseWriter, r *http.Request, user meta.User) {
+				<-reg.WaitFor("tsdb")
+				h.serveQuery(w, r, user)
+			},
 		},
 		Route{
 			"write-options", // Satisfy CORS checks.
