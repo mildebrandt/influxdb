@@ -506,7 +506,7 @@ describe('DataExplorer', () => {
         cy.getByTestID('time-machine-submit-button').click()
       })
 
-      cy.getByTestID('empty-graph--no-results').should('exist')
+      cy.getByTestID('empty-graph--no-results').should('be.visible')
     })
 
     it('can save query as task even when it has a variable', () => {
@@ -544,7 +544,7 @@ describe('DataExplorer', () => {
       cy.getByTestID('task-form-save').click()
 
       cy.getByTestID(`task-card`)
-        .should('exist')
+        .should('be.visible')
         .should('contain', taskName)
     })
   })

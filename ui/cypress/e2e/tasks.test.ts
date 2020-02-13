@@ -37,10 +37,12 @@ from(bucket: "${name}")
 
     cy.getByTestID('task-save-btn').click()
 
-    cy.getByTestID('notification-error').should(
-      'contain',
-      'error calling function "to": missing required keyword argument "bucketID"'
-    )
+    cy.getByTestID('notification-error')
+      .should('be.visible')
+      .should(
+        'contain',
+        'error calling function "to": missing required keyword argument "bucketID"'
+      )
   })
 
   it('can create a task', () => {
@@ -55,6 +57,7 @@ from(bucket: "${name}")
     cy.getByTestID('task-save-btn').click()
 
     cy.getByTestID('task-card')
+      .should('be.visible')
       .should('have.length', 1)
       .and('contain', taskName)
   })
@@ -239,6 +242,7 @@ http.post(
       )
       cy.getByTestID('task-save-btn').click()
       cy.getByTestID('task-card')
+        .should('be.visible')
         .should('have.length', 1)
         .and('contain', taskName)
 
@@ -340,6 +344,7 @@ http.post(
       })
       cy.getByTestID('task-save-btn').click()
       cy.getByTestID('task-card')
+        .should('be.visible')
         .should('have.length', 2)
         .and('contain', firstTask)
         .and('contain', secondTask)
