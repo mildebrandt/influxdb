@@ -105,6 +105,8 @@ type Server struct {
 	tcpAddr string
 
 	config *Config
+
+	cancel context.CancelFunc // used to implement backwards compatible Open()/Close() api
 }
 
 // updateTLSConfig stores with into the tls config pointed at by into but only if with is not nil
@@ -374,7 +376,15 @@ func (s *Server) Err() <-chan error { return s.err }
 
 // Open opens the meta and data store and all services.
 func (s *Server) Open() error {
-	return s.OpenWithContext(context.Background())
+	ctx, cancel := context.WithCancel(context.Background())
+		s.cancel = cancel
+	return s.OpenWithContext(ctx)
+}
+
+// Open opens the meta and data store and all services.
+func (s *Server) Close() error {
+		s.cancel()
+			return nil
 }
 
 func (s *Server) OpenWithContext(ctx context.Context) error {

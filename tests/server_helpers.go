@@ -3,6 +3,7 @@ package tests
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -243,6 +244,8 @@ func OpenDefaultServer(c *Config) Server {
 type LocalServer struct {
 	mu sync.RWMutex
 	*run.Server
+
+	cancel context.CancelFunc
 
 	*client
 	Config *Config
